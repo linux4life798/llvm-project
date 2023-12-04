@@ -312,6 +312,14 @@ class SourceLocation(Structure):
         return self._get_instantiation()[3]
 
     @property
+    def is_from_main_file(self) -> bool:
+        """
+        Returns true if the given source location is in the main file of the
+        corresponding translation unit.
+        """
+        return conf.lib.clang_Location_isFromMainFile(self)
+
+    @property
     def is_in_system_header(self) -> bool:
         """Returns true if the given source location is in a system header."""
         return conf.lib.clang_Location_isInSystemHeader(self)
@@ -3827,6 +3835,7 @@ functionList = [
     ("clang_Cursor_getBriefCommentText", [Cursor], _CXString, _CXString.from_result),
     ("clang_Cursor_getRawCommentText", [Cursor], _CXString, _CXString.from_result),
     ("clang_Cursor_getOffsetOfField", [Cursor], c_longlong),
+    ("clang_Location_isFromMainFile", [SourceLocation], bool),
     ("clang_Location_isInSystemHeader", [SourceLocation], bool),
     ("clang_Type_getAlignOf", [Type], c_longlong),
     ("clang_Type_getClassType", [Type], Type, Type.from_result),
