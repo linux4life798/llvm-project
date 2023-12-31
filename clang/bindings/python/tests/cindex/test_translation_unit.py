@@ -82,7 +82,7 @@ class TestTranslationUnit(unittest.TestCase):
     def test_unsaved_files(self):
         tu = TranslationUnit.from_source(
             "fake.c",
-            ["-I./"],
+            ["-I."],
             unsaved_files=[
                 (
                     "fake.c",
