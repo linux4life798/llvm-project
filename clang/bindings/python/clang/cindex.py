@@ -6,6 +6,8 @@
 #
 # ===------------------------------------------------------------------------===#
 
+#%%
+
 r"""
 Clang Indexing Library Bindings
 ===============================
@@ -63,6 +65,8 @@ from __future__ import absolute_import, annotations, division, print_function
 # o implement additional SourceLocation, SourceRange, and File methods.
 
 from ctypes import *
+import pathlib
+import textwrap
 from typing import Iterable
 
 import clang.enumerations
@@ -3904,6 +3908,35 @@ class Config:
         ...
 
     @staticmethod
+    def generate_clib_types_file():
+        TYPES_FILE = pathlib.Path("cindex_types.pyi")
+        HEADER = textwrap.dedent("""\
+        from ctypes import *
+        from typing import Callable
+
+        class Config:
+            class CDLL:
+        """)
+
+        with TYPES_FILE.open("w") as f:
+            f.write(HEADER)
+            for fun in functionList:
+                name = fun[0]
+                args = []
+                if len(fun) > 1:
+                    if fun[1] is not None:
+                        args = fun[1]
+                ret = None
+                if len(fun) > 2:
+                    ret = fun[2]
+
+                args_str = ', '.join([(arg).__name__ for arg in args])
+                ret_str = type(ret).__name__
+
+                pre = "    " * 2
+                f.write(pre + f"{name}: Callable[[{args_str}], {ret_str}]\n")
+
+    @staticmethod
     def set_library_path(path):
         """Set the path in which to search for libclang"""
         if Config.loaded:
@@ -4032,3 +4065,8 @@ __all__ = [
     "TypeKind",
     "Type",
 ]
+
+#%%
+Config.generate_clib_types_file()
+
+# %%
